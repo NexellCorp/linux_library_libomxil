@@ -37,21 +37,21 @@ all: $(TARGET) install
 
 $(TARGET):	depend $(OBJS)
 	$(quiet)$(AR) $(ARFLAGS) $(LIBNAME).a $(OBJS)
-	$(quiet)$(CC) $(LDFLAGS) -shared -Wl,-soname,$(TARGET) -o $@ $(OBJS) $(LIBRARY)
+	#$(quiet)$(CC) $(LDFLAGS) -shared -Wl,-soname,$(TARGET) -o $@ $(OBJS) $(LIBRARY)
 
 install:
 	@echo "$(ColorMagenta)[[[ Install $(LIBNAME) ]]]$(ColorEnd)"
 	install -m 755 -d $(INSTALL_PATH)
 	install -m 644 $(LIBNAME).a $(INSTALL_PATH)
-	install -m 644 $(TARGET) $(INSTALL_PATH)
+	#install -m 644 $(TARGET) $(INSTALL_PATH)
 
 clean:
 	@echo "$(ColorMagenta)[[[ Clean $(LIBNAME) ]]]$(ColorEnd)"
 	rm -f $(OBJS) $(TARGET) $(LIBNAME).a .depend
 
 distclean: clean
-	rm -f $(INSTALL_PATH)/$(TARGET)
 	rm -f $(INSTALL_PATH)/$(LIBNAME).a
+	#rm -f $(INSTALL_PATH)/$(TARGET)
 
 #########################################################################
 # Dependency

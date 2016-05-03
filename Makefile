@@ -5,9 +5,9 @@ endif
 include buildcfg.mk
 
 INSTALL_DIR = /home/hcjun/devel/nfs/rootfs-omx/usr/lib/
+CONFIG_DIR  = ../sysroot/etc/xdg
 SRC_FILE	= ../linux-artik7/include/uapi/linux/videodev2_nxp_media.h
 DST_FILE	= ./include/linux/videodev2_nxp_media.h
-
 
 DIR		:=
 ######################################################################
@@ -77,3 +77,13 @@ compare:
 		cp -av $(SRC_FILE) $(DST_FILE);		\
 	fi
 	@echo "$(ColorEnd)"
+
+config_file:
+	@echo "$(ColorMagenta)###############################################$(ColorEnd)"
+	@echo "$(ColorMagenta)#                                             #$(ColorEnd)"
+	@echo "$(ColorMagenta)#        Copy GST-OMX Config File             #$(ColorEnd)"
+	@echo "$(ColorMagenta)#                                             #$(ColorEnd)"
+	@echo "$(ColorMagenta)###############################################$(ColorEnd)"
+	mkdir -p $(CONFIG_DIR)
+	cp -av ./lib/gstomx.conf $(CONFIG_DIR)/
+

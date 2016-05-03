@@ -48,6 +48,8 @@ LIBRARY += \
 #	Compile Options
 CFLAGS	+= -fPIC
 
+all: $(TARGET) install
+
 $(TARGET):	depend $(OBJS)
 	$(quiet)$(CC) $(LDFLAGS) -shared -Wl,-soname,$(SONAME) -o $@ $(OBJS) $(LIBRARY)
 
