@@ -63,6 +63,8 @@ typedef struct tNX_VIDENC_COMP_TYPE{
 	OMX_VIDEO_PARAM_AVCTYPE   	omxAVCEncParam;
 	OMX_VIDEO_PARAM_H263TYPE	omxH263EncParam;
 
+	OMX_VIDEO_PARAM_PROFILELEVELTYPE	omxMp4EncProfile;	 
+
 	/* Android Native Buffer Flasg */
 	OMX_BOOL					bUseNativeBuffer;
 	OMX_BOOL					bMetaDataInBuffers;

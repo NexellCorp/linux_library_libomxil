@@ -148,6 +148,21 @@ static void SetDefaultAvcEncParam( OMX_VIDEO_PARAM_AVCTYPE *avcType, int portInd
 	avcType->eLoopFilterMode = OMX_VIDEO_AVCLoopFilterEnable;	/* Enable/disable loop filter */
 }
 
+static void SetDefaultMp4EncProfile( OMX_VIDEO_PARAM_PROFILELEVELTYPE *mp4ProfileType, int portIndex )
+{
+	mp4ProfileType->nSize = sizeof(OMX_VIDEO_PARAM_PROFILELEVELTYPE);
+	NX_OMXSetVersion(&mp4ProfileType->nVersion);
+	mp4ProfileType->nPortIndex = portIndex;
+	mp4ProfileType->eProfile = OMX_VIDEO_MPEG4ProfileSimple;	/**< type is OMX_VIDEO_AVCPROFILETYPE, OMX_VIDEO_H263PROFILETYPE, 
+																	or OMX_VIDEO_MPEG4PROFILETYPE depending on context */
+	mp4ProfileType->eLevel = OMX_VIDEO_MPEG4Level2;				/**< type is OMX_VIDEO_AVCLEVELTYPE, OMX_VIDEO_H263LEVELTYPE, 	
+																	or OMX_VIDEO_MPEG4PROFILETYPE depending on context */
+	mp4ProfileType->nProfileIndex = 0;							/**< Used to query for individual profile support information,
+																	This parameter is valid only for 
+																	OMX_IndexParamVideoProfileLevelQuerySupported index,
+																	For all other indices this parameter is to be ignored. */
+}
+
 OMX_ERRORTYPE OMX_ComponentInit (OMX_HANDLETYPE hComponent)
 {
 	OMX_ERRORTYPE eError = OMX_ErrorNone;
@@ -261,6 +276,8 @@ OMX_ERRORTYPE OMX_ComponentInit (OMX_HANDLETYPE hComponent)
 	SetDefaultAvcEncParam( &pEncComp->omxAVCEncParam, 1 );
 	SetDefaultH263EncParam( &pEncComp->omxH263EncParam, 1 );
 
+	SetDefaultMp4EncProfile( &pEncComp->omxMp4EncProfile, 1 );
+	
 	pEncComp->pPrevInputBuffer = NULL;
 
 	return OMX_ErrorNone;
@@ -515,6 +532,18 @@ static OMX_ERRORTYPE NX_VidEncGetParameter (OMX_HANDLETYPE hComp, OMX_INDEXTYPE 
 			errCorrection->bEnableRVLC = OMX_FALSE;
 			break;
 		}
+		case OMX_IndexParamVideoProfileLevelCurrent:
+		{
+ 			OMX_VIDEO_PARAM_PROFILELEVELTYPE *pProfileLevel = (OMX_VIDEO_PARAM_PROFILELEVELTYPE *)ComponentParamStruct;
+			TRACE("%s() : OMX_IndexParamVideoProfileLevelCurrent : port Index = %ld\n", __FUNCTION__, pProfileLevel->nPortIndex );
+			if(pEncComp->vpuCodecId == NX_MP4_ENC)
+			{
+				pProfileLevel->eProfile = pEncComp->omxMp4EncProfile.eProfile;
+				pProfileLevel->eLevel = pEncComp->omxMp4EncProfile.eLevel;
+				return OMX_ErrorNone;
+			}
+			return OMX_ErrorUnsupportedIndex;
+		}		
 		default :
 			return NX_BaseGetParameter( hComp, nParamIndex, ComponentParamStruct );
 	}
@@ -715,6 +744,18 @@ static OMX_ERRORTYPE NX_VidEncSetParameter (OMX_HANDLETYPE hComp, OMX_INDEXTYPE 
 			break;
 		}
 #endif
+		case OMX_IndexParamVideoProfileLevelCurrent:
+		{
+			OMX_VIDEO_PARAM_PROFILELEVELTYPE *pProfileLevel = (OMX_VIDEO_PARAM_PROFILELEVELTYPE *)ComponentParamStruct;
+			TRACE("%s() : OMX_IndexParamVideoProfileLevelCurrent : port Index = %ld\n", __FUNCTION__, pProfileLevel->nPortIndex );
+			if(pEncComp->vpuCodecId == NX_MP4_ENC)
+			{
+				pEncComp->omxMp4EncProfile.eProfile = pProfileLevel->eProfile;
+				pEncComp->omxMp4EncProfile.eLevel = pProfileLevel->eLevel;
+				return OMX_ErrorNone;
+			}
+			return OMX_ErrorUnsupportedIndex;
+		}
 		default :
 			return NX_BaseSetParameter( hComp, nParamIndex, ComponentParamStruct );
 	}
