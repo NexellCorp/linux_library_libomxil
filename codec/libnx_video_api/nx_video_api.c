@@ -899,7 +899,7 @@ VPU_ERROR_E NX_V4l2DecDecodeFrame( NX_V4L2DEC_HANDLE hDec, NX_V4L2DEC_IN *pDecIn
 		goto ERROR_EXIT;
 	}
 
-	if( 0 < hDec->hBitStreamBuf->size )
+	if( 0 < pDecIn->strmSize )
 	{
 		/* Dequeue Input ES Buffer -> Get Decoded Order Result */
 		memset( &buf, 0, sizeof(buf) );

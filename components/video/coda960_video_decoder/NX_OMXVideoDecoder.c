@@ -2170,13 +2170,14 @@ int32_t processEOS(NX_VIDDEC_VIDEO_COMP_TYPE *pDecComp)
 		ret = NX_V4l2DecDecodeFrame( pDecComp->hVpuCodec, &decIn, &decOut );
 		if( ret==VID_ERR_NONE && decOut.outImgIdx >= 0 && ( decOut.outImgIdx < NX_OMX_MAX_BUF ) )
 		{
+			NX_VID_MEMORY_INFO *pImg = NULL;
 			int32_t outIdx = ( pDecComp->bInterlaced == 0 ) ? ( decOut.outImgIdx ) : ( GetUsableBufferIdx(pDecComp) );
 			pOutBuf = pDecComp->pOutputBuffers[outIdx];
 
 			if( pDecComp->bEnableThumbNailMode == OMX_TRUE )
 			{
 				/* Thumbnail Mode */
-				NX_VID_MEMORY_INFO *pImg = &decOut.outImg;
+				pImg = &decOut.outImg;
 				NX_PopQueue( pDecComp->pOutputPortQueue, (void**)&pOutBuf );
 				CopyImageToBufferYV12( (OMX_U8*)pImg->pBuffer[0], (OMX_U8*)pImg->pBuffer[1], (OMX_U8*)pImg->pBuffer[2],
 					pOutBuf->pBuffer, pImg->stride[0], pImg->stride[1], pDecComp->width, pDecComp->height );
@@ -2186,6 +2187,7 @@ int32_t processEOS(NX_VIDDEC_VIDEO_COMP_TYPE *pDecComp)
 			}
 			else
 			{
+#ifdef ANDROID				
 				/* Native Window Buffer Mode */
 				/* Get Output Buffer Pointer From Output Buffer Pool */
 				if( pDecComp->outBufferUseFlag[outIdx] == 0 )
@@ -2198,8 +2200,25 @@ int32_t processEOS(NX_VIDDEC_VIDEO_COMP_TYPE *pDecComp)
 				{
 					pDecComp->outBufferUseFlag[outIdx] = 0;
 					pDecComp->curOutBuffers --;
-					//pOutBuf->nFilledLen = sizeof(struct private_handle_t);
+					pOutBuf->nFilledLen = sizeof(struct private_handle_t);
 				}
+#else
+				pImg = &decOut.outImg;
+				if( 0 != NX_PopQueue( pDecComp->pOutputPortQueue, (void**)&pOutBuf ) )
+				{
+					NX_V4l2DecClrDspFlag( pDecComp->hVpuCodec, NULL, decOut.outImgIdx );
+					ErrMsg("[EOS]Unexpected Buffer Handling!!!! Goto Exit\n");
+					return 0;
+				}
+				outIdx = FindBufferIdx(pDecComp, pOutBuf);
+				pDecComp->outBufferValidFlag[outIdx] = decOut.outImgIdx + 1;
+				pOutBuf->nFilledLen = pDecComp->width * pDecComp->height * 3 / 2;
+				pImg = &decOut.outImg;
+				CopyImageToBufferYV12( (OMX_U8*)pImg->pBuffer[0], (OMX_U8*)pImg->pBuffer[1], (OMX_U8*)pImg->pBuffer[2],
+					pOutBuf->pBuffer, pImg->stride[0], pImg->stride[1], pDecComp->width, pDecComp->height );
+				pDecComp->outBufferUseFlag[outIdx] = 0;
+				pDecComp->curOutBuffers --;
+#endif				
 
 				DeInterlaceFrame( pDecComp, &decOut );
 			}
