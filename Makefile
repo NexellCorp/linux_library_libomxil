@@ -6,7 +6,12 @@ include buildcfg.mk
 
 INSTALL_DIR = /home/hcjun/devel/nfs/rootfs-omx/usr/lib/
 CONFIG_DIR  = ../sysroot/etc/xdg
+
+ifeq ($(NATIVE_BUILD), yes)
+SRC_FILE	= ./videodev2_nxp_media.h
+else
 SRC_FILE	= ../linux-artik7/include/uapi/linux/videodev2_nxp_media.h
+endif
 DST_FILE	= ./include/linux/videodev2_nxp_media.h
 
 DIR		:=

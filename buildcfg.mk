@@ -5,7 +5,11 @@
 OBJTREE		:= $(if $(BUILD_DIR),$(BUILD_DIR),$(CURDIR))
 
 ARCHNAME   	:= S5P6818
+ifeq ($(NATIVE_BUILD), yes)
+CROSSNAME	:=
+else
 CROSSNAME	:= aarch64-linux-gnu-
+endif
 
 ifneq ($(verbose),1)
 	quiet	:= @
