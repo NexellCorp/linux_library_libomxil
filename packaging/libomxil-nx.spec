@@ -27,7 +27,7 @@ Nexell OpenMax library (devel)
 %setup -q
 
 %build
-make all
+make all NATIVE_BUILD=yes SONAME=libomxil-nx
 
 %postun -p /sbin/ldconfig
 
