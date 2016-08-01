@@ -1,7 +1,7 @@
 Name:    libomxil-nx
 Version: 0.0.1
 Release: 0
-License: Apache 2.0
+License: LGPLv2+
 Summary: Nexell OpenMax library
 Group: Development/Libraries
 Source:  %{name}-%{version}.tar.gz
@@ -42,6 +42,8 @@ cp %{_builddir}/%{name}-%{version}/lib/*  %{buildroot}/usr/lib
 
 %files
 %attr (0644, root, root) %{_libdir}/*
+%license LICENSE.LGPLv2+
 
 %files devel
 %attr (0644, root, root) %{_includedir}/*
+%license LICENSE.LGPLv2+
