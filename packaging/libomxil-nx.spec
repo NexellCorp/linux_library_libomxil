@@ -17,7 +17,7 @@ Nexell OpenMax library
 %package devel
 Summary: Nexell OpenMax library
 Group: Development/Libraries
-License: Apache 2.0
+License: LGPLv2+
 Requires: %{name} = %{version}-%{release}
 
 %description devel
